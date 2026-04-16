@@ -1,0 +1,79 @@
+Resource yang akan dibuat
+1. Compute (Application Server)
+    Digital Ocean Droplet
+    Menjalankan:
+    Backend NestJS (API)
+    Frontend Nuxt.js (bisa SSR atau static build via Nginx)
+    Laravel Filament (admin panel)
+    OS: Ubuntu 22.04
+    Dikelola menggunakan SSH key (bukan password)
+2. Database
+    Managed PostgreSQL (Digital Ocean Managed Database)
+    Menyimpan data products
+    Terraform akan mengatur:
+    DB cluster
+    user & password
+    connection string
+3. Networking
+    VPC (Virtual Private Cloud)
+    Mengisolasi komunikasi internal antara Droplet dan Database
+    Firewall Rules
+    Hanya membuka port yang diperlukan:
+    80 / 443 (HTTP/HTTPS)
+    22 (SSH, restricted IP)
+    akses database hanya dari internal VPC
+4. Domain & Load Balancing (opsional tapi ideal)
+    Load Balancer
+    Mengatur traffic ke aplikasi frontend/backend
+    Domain + DNS
+    Mapping domain ke load balancer atau droplet IP
+5. Storage (opsional)
+    Digital Ocean Spaces (jika ada file upload seperti gambar produk)
+    Alur Deployment Aplikasi
+1. Provisioning Infrastruktur (Terraform)
+    Jalankan:
+    terraform init
+    terraform plan
+    terraform apply
+
+    Terraform akan membuat:
+
+    Droplet server
+    Database PostgreSQL
+    VPC & firewall
+    (opsional) load balancer
+2. Build Aplikasi (CI/CD GitLab)
+
+    Pipeline akan:
+
+    Install dependencies
+    Build:
+    Nuxt.js → production build
+    NestJS → compile TypeScript
+    Laravel → optimize Filament
+3. Deploy ke Server (Digital Ocean Droplet)
+
+    Deployment dilakukan via SSH atau GitLab runner:
+
+    Alur:
+    GitLab CI melakukan SSH ke Droplet
+    Pull source code dari repository
+    Install dependencies di server
+    Build aplikasi (atau pakai pre-build artifact)
+    Restart service menggunakan:
+    PM2 (NestJS & Nuxt SSR)
+    Nginx (reverse proxy)
+    4. Konfigurasi Runtime
+    Nginx
+    Reverse proxy:
+    /api → NestJS
+    /admin → Laravel Filament
+    / → Nuxt frontend
+    PM2
+    Menjaga service tetap berjalan
+5. Environment Management
+    .env disimpan di server atau secret CI/CD
+    Database URL dari Managed PostgreSQL Digital Ocean
+    Kesimpulan
+
+    Dengan Terraform, seluruh infrastruktur (server, database, networking) dapat dibuat secara otomatis dan konsisten. Deployment aplikasi dilakukan melalui pipeline CI/CD yang melakukan build, kemudian deploy ke Droplet Digital Ocean menggunakan SSH dengan konfigurasi service (PM2 + Nginx).
