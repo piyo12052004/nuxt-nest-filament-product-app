@@ -1,0 +1,78 @@
+name: Fullstack CI Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # =====================
+      # CHECKOUT
+      # =====================
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # =====================
+      # NODE SETUP
+      # =====================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # =====================
+      # NESTJS
+      # =====================
+      - name: Install NestJS
+        working-directory: be_nest-js
+        run: npm install
+
+      - name: Build NestJS
+        working-directory: be_nest-js
+        run: npm run build
+
+      # =====================
+      # NUXT
+      # =====================
+      - name: Install Nuxt
+        working-directory: fe_nuxt
+        run: npm install
+
+      - name: Build Nuxt
+        working-directory: fe_nuxt
+        run: npm run build
+
+      # =====================
+      # LARAVEL
+      # =====================
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: Install Laravel dependencies
+        working-directory: be_laravel
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Setup .env
+        working-directory: be_laravel
+        run: |
+          cp .env.example .env
+
+      - name: Generate APP_KEY
+        working-directory: be_laravel
+        run: php artisan key:generate
+
+      - name: Laravel check
+        working-directory: be_laravel
+        run: php artisan --version
+
+      # =====================
+      # FINAL STATUS
+      # =====================
+      - name: CI Success Message
+        run: echo "✅ ALL SERVICES BUILD SUCCESS"
