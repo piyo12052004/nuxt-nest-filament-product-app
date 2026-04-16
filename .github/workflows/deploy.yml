@@ -49,27 +49,35 @@ jobs:
       # =====================
       # LARAVEL
       # =====================
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
 
-      - name: Install Laravel dependencies
+      - name: Install Laravel PHP dependencies
         working-directory: be_laravel
         run: composer install --no-interaction --prefer-dist
 
       - name: Setup .env
         working-directory: be_laravel
-        run: |
-          cp .env.example .env
+        run: cp .env.example .env
 
       - name: Generate APP_KEY
         working-directory: be_laravel
         run: php artisan key:generate
 
-      - name: Laravel check
+      # =====================
+      # NODE (Laravel frontend - Alpine/Vite)
+      # =====================
+
+      - name: Install Laravel Node dependencies
         working-directory: be_laravel
-        run: php artisan --version
+        run: npm install
+
+      - name: Build Laravel assets
+        working-directory: be_laravel
+        run: npm run build
 
       # =====================
       # FINAL STATUS
