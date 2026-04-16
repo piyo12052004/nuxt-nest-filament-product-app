@@ -1,0 +1,44 @@
+image: node:20
+
+stages:
+  - build
+
+build_all:
+  stage: build
+
+  before_script:
+    - apt-get update && apt-get install -y curl unzip git
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
+
+  script:
+    # =====================
+    # NESTJS
+    # =====================
+    - echo "Building NestJS..."
+    - cd be_nest-js
+    - npm install
+    - npm run build
+    - cd ..
+
+    # =====================
+    # NUXT
+    # =====================
+    - echo "Building Nuxt..."
+    - cd fe_nuxt
+    - npm install
+    - npm run build
+    - cd ..
+
+    # =====================
+    # LARAVEL
+    # =====================
+    - echo "Building Laravel..."
+    - cd be_laravel
+    - composer install --no-interaction --prefer-dist
+    - cp .env.example .env
+    - php artisan key:generate
+    - php artisan --version
+
+  only:
+    - main
