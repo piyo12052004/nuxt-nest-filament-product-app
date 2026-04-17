@@ -111,5 +111,5 @@ Laravel service requires a properly configured .env file
 📌 Run Order (Recommended)
 PostgreSQL (ensure service is active)
 NestJS (npm run start:dev)
-Laravel (php artisan serve)
+Laravel (php artisan serve & npm run dev)
 Nuxt (npm run dev)
